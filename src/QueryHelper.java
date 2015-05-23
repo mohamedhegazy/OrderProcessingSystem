@@ -1,5 +1,10 @@
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -19,7 +24,74 @@ public class QueryHelper {
 				"jdbc:mysql://localhost/OrderProcessingSystem", userName,
 				password);
 	}
+	public String addBookAuthor(String[] Fields, String[] values) throws SQLException {
+		String ans = "Successfull!";
+		java.sql.Statement stmt = conn.createStatement();
+		String val = "";
+		String field = "";
+		int i;
+		for (i = 0; i < values.length - 1; i++) {
+			field = field + Fields[i] + ",";
+			val = val + values[i] + ",";
+		}
+		field = field + Fields[i];
+		val = val + values[i];
+		stmt.addBatch("insert into Authors(" + field + ") values(" + val + ");");
+		try {
+			stmt.executeBatch();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			ans = e.getMessage();
+		}
+		return ans;
+		
+	}
 
+	public String addAuthor(String[] Fields, String[] values) throws SQLException {
+		String ans = "Successfull!";
+		java.sql.Statement stmt = conn.createStatement();
+		String val = "";
+		String field = "";
+		int i;
+		for (i = 0; i < values.length - 1; i++) {
+			field = field + Fields[i] + ",";
+			val = val + values[i] + ",";
+		}
+		field = field + Fields[i];
+		val = val + values[i];
+		stmt.addBatch("insert into Authors_Names(" + field + ") values(" + val + ");");
+		try {
+			stmt.executeBatch();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			ans = e.getMessage();
+		}
+		return ans;
+		
+	}
+
+	public String addPublisher(String[] Fields, String[] values) throws SQLException {
+		String ans = "Successfull!";
+		java.sql.Statement stmt = conn.createStatement();
+		String val = "";
+		String field = "";
+		int i;
+		for (i = 0; i < values.length - 1; i++) {
+			field = field + Fields[i] + ",";
+			val = val + values[i] + ",";
+		}
+		field = field + Fields[i];
+		val = val + values[i];
+		stmt.addBatch("insert into Publisher(" + field + ") values(" + val + ");");
+		try {
+			stmt.executeBatch();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			ans = e.getMessage();
+		}
+		return ans;
+		
+	}
 	// manager adds book
 	public String addBook(String[] Fields, String[] values) throws SQLException {
 		String ans = "Successfull!";
@@ -93,17 +165,22 @@ public class QueryHelper {
 	public java.sql.ResultSet searchBook(String[] Fields, String[] values)
 			throws SQLException {
 		java.sql.Statement stmt = conn.createStatement();
-		String select = "";
+		String select = " where ";
 		int i;
 		for (i = 0; i < values.length - 1; i++) {
 			select = select + Fields[i] + "=" + values[i] + " AND ";
 		}
+		if(Fields.length>0)
 		select = select + Fields[i] + "=" + values[i];
 		java.sql.ResultSet rs;
 		try {
-			rs = stmt.executeQuery("select * from Book where " + select + ";");
+			if(Fields.length>0)
+			rs = stmt.executeQuery("select * from Book " + select + ";");
+			else
+			rs = stmt.executeQuery("select * from Book;");
 		} catch (SQLException e) {
 			// TODO: handle exception
+			System.out.println(e.getMessage());
 			return null;
 		}
 		return rs;
@@ -120,8 +197,12 @@ public class QueryHelper {
 			field = field + Fields[i] + ",";
 			val = val + values[i] + ",";
 		}
-		field = field + Fields[i] + ",Privilege";
-		val = val + values[i] + ",0";
+		field = field + Fields[i];
+		val = val + values[i];
+		if(!field.contains("PRIVILEGE")){
+			field = field  + ",PRIVILEGE";
+			val = val  + ",0";			
+		}
 		stmt.addBatch("insert into Sys_User(" + field + ") values(" + val
 				+ ");");
 		try {
@@ -161,27 +242,37 @@ public class QueryHelper {
 	public String checkoutCart(String user, String[][] items)
 			throws SQLException {
 		String ans = "Successful!";
-		String queryString = "START TRANSACTION;\n"
-				+ "insert into Customer_Order(User_ID ,Order_date) values("
-				+ user + ",curdate());\n";
-		String tempItemsString = "";
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date now = new Date();
+		String date=dateFormat.format(now);
+		java.sql.Statement stmt_itemStatement = conn.createStatement();
+		String queryString = "START TRANSACTION;\n";
+		stmt_itemStatement.addBatch(queryString);		
+		queryString = "";
+		queryString=queryString+ "insert into Customer_Order (User_ID,Order_date) values ("
+				+ user + ",'"+date+"');\n";
+		stmt_itemStatement.addBatch(queryString);
+		queryString = "";
 		int i;
 		for (i = 0; i < items.length; i++) {
-			tempItemsString = tempItemsString
+			queryString = queryString					
 					+ "insert into Customer_Order_Items values("
-					+ "LAST_INSERT_ID()," + items[i][0] + "," + items[i][1]
-					+ ";\n";
+					+ "last_insert_id(),'" + items[i][0] + "'," + items[i][1]
+					+ ");\n";
 			// last_insert_id() will return the latest generated auto increment key 
 			// which is the ID of the entry inserted  in the customer_order table
 			// book isbn in items[i][0] and number of
 			// ordered copies is items[i][1]
-			tempItemsString = tempItemsString
+			stmt_itemStatement.addBatch(queryString);		
+			queryString = "";
+			queryString = queryString
 					+ "update Book set NO_OF_COPIES=NO_OF_COPIES-"
-					+ items[i][1] + "where ISBN=" + items[i][0] + ";\n";
+					+ items[i][1] + " where ISBN='" + items[i][0] + "';\n";
+			stmt_itemStatement.addBatch(queryString);		
+			queryString = "";
 		}
-		tempItemsString = tempItemsString + "COMMIT;\n";
-		queryString = queryString + tempItemsString;
-		java.sql.Statement stmt_itemStatement = conn.createStatement();
+		queryString = "";
+		queryString = queryString + "COMMIT;\n";
 		stmt_itemStatement.addBatch(queryString);
 		try {
 			stmt_itemStatement.executeBatch();
@@ -223,7 +314,10 @@ public class QueryHelper {
 			val = val + values[i] + ",";
 		}
 		val = val + values[i];
-		val = val + "curdate(),0";
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date now = new Date();
+		String date=dateFormat.format(now);
+		val = val + ",'"+date+"',0";
 		stmt.addBatch("insert into Manager_Order(" + placeString + ") values("
 				+ val + ");");
 		try {

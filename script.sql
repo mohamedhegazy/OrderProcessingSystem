@@ -3,19 +3,19 @@ use  OrderProcessingSystem;
 
 
 CREATE TABLE Book
-( ISBN VARCHAR(13) NOT NULL ,  title  VARCHAR(50),Publisher INT NOT NULL,Publication_Year DATE,Price INT NOT
+(ISBN VARCHAR(13) NOT NULL ,  title  VARCHAR(50),Publisher INT NOT NULL,Publication_Year DATE,Price INT NOT
      NULL,Category INT NOT NULL,Minimum_threshold INT NOT NULL,NO_OF_COPIES INT NOT NULL,  PRIMARY KEY (ISBN));
 
 create table Category (ID INT NOT NULL AUTO_INCREMENT ,Name varchar(50),Primary Key(ID));
 Create table Authors (Author_ID   INT NOT NULL AUTO_INCREMENT ,ISBN VARCHAR(13),PRIMARY KEY(Author_ID ,ISBN));
-Create table Authors_Names (ID INT NOT NULL,First_Name  varchar(50) NOT NULL,Last_Name  varchar(50) NOT NULL, PRIMARY KEY (ID));
+Create table Authors_Names (ID INT NOT NULL AUTO_INCREMENT,First_Name  varchar(50) NOT NULL,Last_Name  varchar(50) NOT NULL, PRIMARY KEY (ID));
 
 Create table Publisher(ID INT NOT NULL AUTO_INCREMENT, Name VARCHAR(50) NOT NULL,Address VARCHAR(50) NOT NULL,
  Phone VARCHAR(20),PRIMARY KEY(id));
 
 
 
-alter table Authors_Names add FOREIGN KEY (ID) REFERENCES Authors(Author_ID);
+alter table Authors add FOREIGN KEY (Author_ID) REFERENCES Authors_Names(ID);
 alter table Authors add FOREIGN KEY (ISBN) REFERENCES Book(ISBN);
 alter table Book add Foreign KEY (Publisher) References Publisher(ID);
 alter table Book add Foreign Key (Category) References Category(ID);
@@ -30,7 +30,9 @@ insert into Category values (4,'History');
 insert into Category values (5,'Geography');
 
 
-Create table Sys_User(ID  INT NOT NULL AUTO_INCREMENT ,PRIVILEGE INT NOT NULL,User_name Varchar(50),Password Varchar(50),First_name varchar(50),Last_name varchar(50),Email varchar(100),Phone_number varchar(20),Shipping_Address varchar(200) , PRIMARY KEY (ID) , KEY(User_name)
+Create table Sys_User(ID  INT NOT NULL AUTO_INCREMENT ,PRIVILEGE INT NOT NULL,
+User_name Varchar(50),Password Varchar(50),First_name varchar(50),Last_name varchar(50)
+,Email varchar(100),Phone_number varchar(20),Shipping_Address varchar(200) , PRIMARY KEY (ID) , KEY(User_name)
 );
 insert into Sys_User (ID,PRIVILEGE,USER_NAME) values (1,1,'Order Man');
 
@@ -110,13 +112,12 @@ group by ISBN;
 
 --2nd report query (The top 5 customers who purchase the most purchase amount in descending order for the last three months)
 select User_name,sum(i.NO_OF_COPIES) as Number_of_Purchases
-from Customer_Order o join Sys_User c on o.User_ID=c.ID join Customer_Order_Items i on o.Order_ID=i.Order_ID 
-where Month(Order_date) >= Month(DATE_SUB(curdate(),INTERVAL 3 MONTH)) AND YEAR(Order_date) = YEAR(DATE_SUB(Order_date,INTERVAL 3 MONTH)) 
+from Customer_Order o join Sys_User c on o.User_ID=c.ID join Customer_Order_Items i on o.Order_ID=i.Order_ID
+where Month(Order_date) >= Month(DATE_SUB(curdate(),INTERVAL 3 MONTH)) AND YEAR(Order_date) = YEAR(DATE_SUB(Order_date,INTERVAL 3 MONTH))
 group by c.ID
 order by Number_of_Purchases DESC
 LIMIT 5
 ;
-
 --3rd report query (The top 10 selling books for the last three months)
 select title,sum(i.NO_OF_COPIES) as Number_of_Copies_Sold
 from Customer_Order o join Customer_Order_Items i on o.Order_ID=i.Order_ID join Book b on b.ISBN=i.Book_ISBN

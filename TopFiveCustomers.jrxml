@@ -8,7 +8,7 @@
 from Customer_Order o join Sys_User c on o.User_ID=c.ID join Customer_Order_Items i on o.Order_ID=i.Order_ID
 where Month(Order_date) >= Month(DATE_SUB(curdate(),INTERVAL 3 MONTH)) AND YEAR(Order_date) = YEAR(DATE_SUB(Order_date,INTERVAL 3 MONTH))
 group by c.ID
-order by Number_of_Purchases
+order by Number_of_Purchases DESC
 LIMIT 5
 ;]]>
 	</queryString>
