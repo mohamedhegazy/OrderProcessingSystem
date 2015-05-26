@@ -5,12 +5,13 @@
 	<property name="ireport.y" value="0"/>
 	<queryString>
 		<![CDATA[select User_name,sum(i.NO_OF_COPIES) as Number_of_Purchases
-from Customer_Order o join Sys_User c on o.User_ID=c.ID join Customer_Order_Items i on o.Order_ID=i.Order_ID
+from Customer_Order o join Sys_User c on o.User_ID=c.User_ID join Customer_Order_Items i on o.Order_ID=i.Order_ID
 where Month(Order_date) >= Month(DATE_SUB(curdate(),INTERVAL 3 MONTH)) AND YEAR(Order_date) = YEAR(DATE_SUB(Order_date,INTERVAL 3 MONTH))
-group by c.ID
+group by c.User_ID
 order by Number_of_Purchases DESC
 LIMIT 5
-;]]>
+;
+]]>
 	</queryString>
 	<field name="User_name" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>

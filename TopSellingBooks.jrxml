@@ -5,7 +5,7 @@
 	<property name="ireport.y" value="0"/>
 	<queryString>
 		<![CDATA[select title,sum(i.NO_OF_COPIES) as Number_of_Copies_Sold
-from Customer_Order o join Customer_Order_Items i on o.Order_ID=i.Order_ID join Book b on b.ISBN=i.Book_ISBN
+from Customer_Order o join Customer_Order_Items i on o.Order_ID=i.Order_ID join Book b on b.ISBN=i.ISBN
 where Month(Order_date) >= Month(DATE_SUB(curdate(),INTERVAL 3 MONTH)) AND YEAR(Order_date) = YEAR(DATE_SUB(Order_date,INTERVAL 3 MONTH))
 group by b.ISBN
 order by Number_of_Copies_Sold DESC

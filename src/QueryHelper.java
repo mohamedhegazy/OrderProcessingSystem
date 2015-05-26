@@ -1,6 +1,5 @@
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -143,7 +142,7 @@ public class QueryHelper {
 
 	// manager says that order is received so he deletes it
 	public String confirmOrder(String order_ID) throws SQLException {
-		// third trigger changed to be before update since we don't delete the
+		// third trigger changed to be before update since we dont delete the
 		// order
 		String ans = "Successful!";
 		java.sql.Statement stmt = conn.createStatement();
@@ -162,11 +161,18 @@ public class QueryHelper {
 		return ans;
 	}
 
-	public java.sql.ResultSet searchBook(String[] Fields, String[] values)
+	public java.sql.ResultSet search(String []table,String[] Fields, String[] values)
 			throws SQLException {
 		java.sql.Statement stmt = conn.createStatement();
-		String select = " where ";
+		String tableString="";
 		int i;
+		for ( i= 0; i < table.length-1; i++) {
+			tableString=tableString+table[i]+" NATURAL JOIN ";
+		}
+		if(table.length>0){
+			tableString=tableString+table[i];
+		}
+		String select = " where ";
 		for (i = 0; i < values.length - 1; i++) {
 			select = select + Fields[i] + "=" + values[i] + " AND ";
 		}
@@ -174,10 +180,19 @@ public class QueryHelper {
 		select = select + Fields[i] + "=" + values[i];
 		java.sql.ResultSet rs;
 		try {
-			if(Fields.length>0)
-			rs = stmt.executeQuery("select * from Book " + select + ";");
-			else
-			rs = stmt.executeQuery("select * from Book;");
+			if(Fields.length>0) {
+				String st = "select * from "+tableString + select + ";";
+				//System.out.println(st);
+				rs = stmt.executeQuery(st);
+			}
+			
+			else{
+				String tString="select * from "+tableString+";";
+				//System.err.println(tString);
+				rs = stmt.executeQuery("select * from "+tableString+";");	
+			}
+			
+			
 		} catch (SQLException e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
@@ -198,7 +213,7 @@ public class QueryHelper {
 			val = val + values[i] + ",";
 		}
 		field = field + Fields[i];
-		val = val + values[i];
+		val = val + ""+values[i];
 		if(!field.contains("PRIVILEGE")){
 			field = field  + ",PRIVILEGE";
 			val = val  + ",0";			
@@ -213,6 +228,43 @@ public class QueryHelper {
 		}
 		return ans;
 	}
+	
+	
+	
+	
+	
+	public String insertIntoTable(String tableName,String[] Fields, String[] values) throws SQLException {
+		String ans = "Successfull!";
+		java.sql.Statement stmt = conn.createStatement();
+		String val = "";
+		String field = "";
+		
+		int i;
+		for (i = 0; i < values.length - 1; i++) {
+			field += Fields[i]+" ,";
+			val += ""+values[i]+",";
+		}
+		if(Fields.length>0) {
+			field += Fields[i];
+			val  = val + ""+values[i];
+		}
+					
+		String st = "insert into "+ tableName +"("+ field +") values(" + val+");";
+		stmt.addBatch(st);
+		
+		try {
+			stmt.executeBatch();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			ans = e.getMessage();
+		}
+		return ans;
+	}
+	
+	
+	
+	
+	
 
 	// user modifies his data
 	public String modifyUser(String[] Fields, String[] values, String user_id)
@@ -226,10 +278,11 @@ public class QueryHelper {
 		}
 		update = update + Fields[i] + "=" + values[i];
 		String conditionString = "";
-		conditionString = conditionString + "ID=" + user_id;// condition on
+		conditionString = conditionString + "User_ID=" + user_id;// condition on
 															// user_id
-		stmt.addBatch("update Sys_User set " + update + " where "
-				+ conditionString + ";");
+		String st = "update Sys_User set " + update + " where "
+				+ conditionString + ";";
+		stmt.addBatch(st);
 		try {
 			stmt.executeBatch();
 		} catch (SQLException e) {
@@ -257,17 +310,18 @@ public class QueryHelper {
 		for (i = 0; i < items.length; i++) {
 			queryString = queryString					
 					+ "insert into Customer_Order_Items values("
-					+ "last_insert_id(),'" + items[i][0] + "'," + items[i][1]
+					+ "last_insert_id()," + items[i][0] + "," + items[i][1]
 					+ ");\n";
 			// last_insert_id() will return the latest generated auto increment key 
 			// which is the ID of the entry inserted  in the customer_order table
 			// book isbn in items[i][0] and number of
 			// ordered copies is items[i][1]
+			System.out.println(queryString);
 			stmt_itemStatement.addBatch(queryString);		
 			queryString = "";
 			queryString = queryString
 					+ "update Book set NO_OF_COPIES=NO_OF_COPIES-"
-					+ items[i][1] + " where ISBN='" + items[i][0] + "';\n";
+					+ items[i][1] + " where ISBN=" + items[i][0] + ";\n";
 			stmt_itemStatement.addBatch(queryString);		
 			queryString = "";
 		}
@@ -282,11 +336,14 @@ public class QueryHelper {
 		}
 		return ans;
 	}
+	
+	
+	
 
 	public String promoteUser(String user_id) throws SQLException {
 		String ans = "Successful!";
 		java.sql.Statement stmt = conn.createStatement();
-		stmt.addBatch("update Sys_User set Privilege=1 where ID=" + user_id
+		stmt.addBatch("update Sys_User set Privilege=1 where User_ID=" + user_id
 				+ ";");
 		try {
 			stmt.executeBatch();
@@ -329,9 +386,9 @@ public class QueryHelper {
 		return ans;
 	}
 
-	// user sign so return his id if -1 return then it's unsuccessful ,fields
+	// user sign so return his id if -1 return then its unsuccessful ,fields
 	// will be user_name and password
-	public int signIn(String[] fields, String[] values) throws SQLException {
+	public int[] login(String[] fields, String[] values) throws SQLException {
 		java.sql.Statement stmt = conn.createStatement();
 		String select = "";
 		int i;
@@ -340,17 +397,22 @@ public class QueryHelper {
 		}
 		select = select + fields[i] + "=" + values[i];
 		java.sql.ResultSet rs;
-		int id = -1;
+		int ans[] = new int[2];
 		try {
 			rs = stmt.executeQuery("select * from Sys_User where " + select
 					+ ";");
 			if (rs.next()) {
-				id = rs.getInt(1);
+				ans[0] = rs.getInt(1);
+				ans[1] = rs.getInt(2);
+				return ans;
 			}
-			return id;
+			else {
+				return null;
+			}
+			
 		} catch (SQLException e) {
 			// TODO: handle exception
-			return id;
+			return null;
 		}
 	}
 

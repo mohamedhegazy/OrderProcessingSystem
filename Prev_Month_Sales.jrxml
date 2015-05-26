@@ -4,9 +4,10 @@
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<queryString>
-		<![CDATA[select ISBN,title,sum(i.NO_OF_COPIES) as Total_Copies_Sold,sum(b.Price) as Gain
-from Customer_Order_Items i join Customer_Order o on i.Order_ID=o.Order_ID join BOOK b on i.Book_ISBN=b.ISBN
-where Month(Order_date) >= Month(DATE_SUB(curdate(),INTERVAL 1 MONTH)) AND YEAR(Order_date) = YEAR(DATE_SUB(Order_date,INTERVAL 1 MONTH)) group by ISBN;
+		<![CDATA[select b.ISBN,title,sum(i.NO_OF_COPIES) as Total_Copies_Sold,sum(b.Price*i.NO_OF_COPIES) as Gain
+from Customer_Order_Items i join Customer_Order o on i.Order_ID=o.Order_ID join BOOK b on i.ISBN=b.ISBN
+where Month(Order_date) >= Month(DATE_SUB(curdate(),INTERVAL 1 MONTH)) AND YEAR(Order_date) = YEAR(DATE_SUB(Order_date,INTERVAL 1 MONTH))
+group by ISBN;
 ]]>
 	</queryString>
 	<field name="ISBN" class="java.lang.String">
