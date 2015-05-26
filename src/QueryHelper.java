@@ -316,7 +316,6 @@ public class QueryHelper {
 			// which is the ID of the entry inserted  in the customer_order table
 			// book isbn in items[i][0] and number of
 			// ordered copies is items[i][1]
-			System.out.println(queryString);
 			stmt_itemStatement.addBatch(queryString);		
 			queryString = "";
 			queryString = queryString

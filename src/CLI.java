@@ -223,6 +223,7 @@ public class CLI {
 		}
 		System.out.println(header);
 		String tempkeyString = "";
+
 		while (rs.next()) {
 			String tupleString = "";
 			if (rs.getString(key).equals(tempkeyString)) {// means result of
@@ -234,10 +235,12 @@ public class CLI {
 					tupleString = tupleString + "                 ";
 				}
 				for (int i = 0; i < multival.length; i++) {
+
 					tupleString = tupleString + rs.getString(multival[i])+"                 ";
 				}
 			} else {// new row
 				for (int i = 0; i < strings.length; i++) {
+
 					tupleString = tupleString + rs.getString(strings[i])
 							+ "                 ";
 				}
@@ -312,13 +315,13 @@ public class CLI {
 			{
 				System.out.println("ENTER BOOK ISBN AND NUMBER OF COPIES as [ISBN,NUMBER OF COPIES]");
 				String orderString=scanner.nextLine();
-				System.out.println(helper.placeOrder(new String []{"ISBN","NO_OF_COPIES"}, orderString.split(",")));
+				System.out.println(helper.placeOrder(new String []{"User_ID","ISBN","NO_OF_COPIES"}, (ans[0]+","+orderString).split(",")));
 			}
 				
 				break;
 			case 6:
 			{
-				print(helper.search(new String []{"Manager_Order"}, new String[]{"IS_DELETED"},new String []{"0"}),new String[]{"User_ID","Order_ID","Order_date","Receive_date","ISBN","NO_OF_COPIES","IS_DELETED"} , "User_ID",new String[]{} , 0);
+				print(helper.search(new String []{"Manager_Order"}, new String[]{"IS_DELETED"},new String []{"0"}),new String[]{"User_ID","Order_ID","Order_date","Receive_date","ISBN","NO_OF_COPIES","IS_DELETED"} , "Order_ID",new String[]{} , 0);
 				System.out.println("Enter Order ID to confirm");
 				int id = Integer.valueOf(scanner.nextLine());
 				System.out.println(helper.confirmOrder(String.valueOf(id)));

@@ -84,7 +84,7 @@ FOR EACH ROW
 BEGIN
 IF NEW.NO_OF_COPIES < NEW.Minimum_threshold  then
    SET @num=NEW.Minimum_threshold-NEW.NO_OF_COPIES;
-   INSERT INTO Manager_Order (Mgr_Id,Order_date,Book_ISBN,NO_OF_COPIES,IS_DELETED)
+   INSERT INTO Manager_Order (User_Id,Order_date,ISBN,NO_OF_COPIES,IS_DELETED)
    values(1,curdate(),NEW.ISBN,@num,0);
 END IF;
 END;
@@ -100,7 +100,9 @@ BEGIN
    THEN
    SET @id=OLD.ISBN;
    SET @num=OLD.NO_OF_COPIES;
-   UPDATE BOOK SET NO_OF_COPIES=@num+NO_OF_COPIES ,Receive_date=curdate() where BOOK_ISBN=@id;
+   SET NEW.Receive_date=curdate();
+   UPDATE BOOK SET NO_OF_COPIES=@num+NO_OF_COPIES  where ISBN=@id;
+   
 END IF;
 END;
 
