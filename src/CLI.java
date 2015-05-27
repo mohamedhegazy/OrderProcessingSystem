@@ -82,7 +82,7 @@ public class CLI {
 				(String[]) values.toArray(new String[values.size()])), new String[] { "ISBN", "title",
 				"Pub_Name", "Publication_Year", "Price", "First_Name",
 				"Last_Name" }, "ISBN",
-				new String[] { "First_Name", "Last_Name" }, 6);
+				new String[] { "First_Name", "Last_Name" }, 5);
 
 	}
 
@@ -193,7 +193,7 @@ public class CLI {
 						.println("ENTER YOUR CREDIT CARD NUMBER[VISA OR MASTER CARD]");
 				String credit = scanner.nextLine();
 				if (credit.matches("^4[0-9]{12}(?:[0-9]{3})?")
-						|| credit.matches("^5[1-5][0-9]{14}")) {
+						|| credit.matches("^5[1-5][0-9]{14}")) {//example of valid 5289898989898989
 					String items[][] = new String[cart.size()][2];
 					for (int i = 0; i < cart.size(); i++) {
 						items[i][0] = cart.get(i).split(" ")[0].split("-")[1];
@@ -218,12 +218,20 @@ public class CLI {
 			String key, String multival[], int offset) throws SQLException {
 		// TODO Auto-generated method stub
 		String header = "";
+		int space=20;
+		String delimiter="--------------------";
 		for (int i = 0; i < strings.length; i++) {
-			header = header + strings[i] + "              ";
+			header = header + strings[i];
+			delimiter=delimiter+"--------------------";
+			for (int j = 0; j < space-strings[i].length()-1; j++) {
+				header = header + " ";	
+			}
+			header=header+"|";
 		}
+		System.out.println(delimiter);
 		System.out.println(header);
+		System.out.println(delimiter);
 		String tempkeyString = "";
-
 		while (rs.next()) {
 			String tupleString = "";
 			if (rs.getString(key).equals(tempkeyString)) {// means result of
@@ -232,17 +240,24 @@ public class CLI {
 				// attributes like author(s)
 				for (int j = 0; j < offset; j++) {// offset for printing
 													// multival
-					tupleString = tupleString + "                 ";
+					for (int k = 0; k < space; k++) {
+					tupleString = tupleString + " ";
+					}
 				}
 				for (int i = 0; i < multival.length; i++) {
-
-					tupleString = tupleString + rs.getString(multival[i])+"                 ";
+					String temp=rs.getString(multival[i]);
+					tupleString = tupleString +temp;
+					for (int j = 0; j < (temp==null?16:space-temp.length()); j++) {
+					tupleString = tupleString +" ";
+					}
 				}
 			} else {// new row
 				for (int i = 0; i < strings.length; i++) {
-
-					tupleString = tupleString + rs.getString(strings[i])
-							+ "                 ";
+					String temp=rs.getString(strings[i]);
+					tupleString = tupleString +temp;
+					for (int j = 0; j < (temp==null?16:space-temp.length()); j++) {
+						tupleString = tupleString +" ";
+						}
 				}
 			}
 			System.out.println(tupleString);
