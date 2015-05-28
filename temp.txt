@@ -1,13 +1,23 @@
 delete from Manager_order;
 delete from Customer_order_Items;
 delete from Customer_order;
-delete from sys_user;
+delete from authors;
+delete from authors_names;
+delete from book;
+delete from publisher;
 
 ALTER TABLE Sys_user AUTO_INCREMENT = 1;
 ALTER TABLE Manager_Order AUTO_INCREMENT = 1;
 ALTER TABLE Customer_Order AUTO_INCREMENT = 1;
 ALTER TABLE Customer_Order_Items AUTO_INCREMENT = 1;
-insert into Sys_User (ID,PRIVILEGE,USER_NAME) values (1,1,'Order Man');
+
+
+ALTER TABLE authors AUTO_INCREMENT = 1;
+ALTER TABLE authors_names AUTO_INCREMENT = 1;
+ALTER TABLE book AUTO_INCREMENT = 1;
+ALTER TABLE publisher AUTO_INCREMENT = 1;
+
+insert into Sys_User (User_ID,PRIVILEGE,USER_NAME) values (1,1,'Order Man');
 
 
 

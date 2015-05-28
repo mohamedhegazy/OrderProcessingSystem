@@ -35,13 +35,13 @@ public class JDBC {
 	  //----------------------------TEST--------------------------------------------//
 	  QueryHelper helper=new QueryHelper("root", "");
 	  for (int i = 0; i < 100; i++) {
-		helper.addPublisher(new String []{"Name","Address","Phone"}, new String []{"'"+randomString(10)+"'","'"+randomString(10)+"'","'"+randomString(10)+"'"});		
+		helper.addPublisher(new String []{"Pub_Name","Address","Phone"}, new String []{"'"+randomString(10)+"'","'"+randomString(10)+"'","'"+randomString(10)+"'"});		
 	}
 	  ArrayList<String> iSBNStrings=new ArrayList<>();
 	  for (long i = 0; i < 500; i++) {
 		  String temp=randomString(13);
 		  iSBNStrings.add(temp);
-		System.out.println(helper.addBook(new String []{"ISBN","title","Publisher","Publication_Year","Price","Category","Minimum_Threshold","NO_OF_COPIES"}
+		System.out.println(helper.addBook(new String []{"ISBN","title","Pub_ID","Publication_Year","Price","Cat_ID","Minimum_Threshold","NO_OF_COPIES"}
 					 , new String []{"'"+temp+"'","'"+randomString(10)+"'",""+randomNumber(1, 99)+"","'"+randomDate()+"'",""+randomNumber(10, 100)+"",""+randomNumber(1, 6)+"",""+randomNumber(5, 15)+"",""+randomNumber(20, 50)+""}));		
 	}
 ////	  java.sql.ResultSet rSet=helper.searchBook(new String[]{}, new String[]{});
@@ -61,17 +61,17 @@ public class JDBC {
 	  for (long i = 0; i < 100; i++,id++) {
 		  long user=randomNumber(0, 2);
 			System.out.println(helper.signUP(new String []{"PRIVILEGE","User_name","Password","First_name","Last_name","Email","Phone_number","Shipping_Address"}
-						 , new String []{""+user+"","'"+randomString(20)+"'","'"+randomString(20)+"'","'"+randomString(20)+"'","'"+randomString(20)+"'","'"+randomString(20)+"'","'"+randomString(20)+"'","'"+randomString(20)+"'"}));
+						 , new String []{""+user+"","'"+randomString(15)+"'","'"+randomString(15)+"'","'"+randomString(15)+"'","'"+randomString(15)+"'","'"+randomString(15)+"'","'"+randomString(15)+"'","'"+randomString(15)+"'"}));
 			if(user==1){//if manager make him place orders
 				for (long j = 0; j < randomNumber(3, 10); j++) {
-					System.out.println("mgr_order "+helper.placeOrder(new String []{"Mgr_ID","Book_ISBN","NO_OF_COPIES"}
+					System.out.println("mgr_order "+helper.placeOrder(new String []{"User_ID","ISBN","NO_OF_COPIES"}
 					 , new String []{""+id+"","'"+iSBNStrings.get((int) randomNumber(0,499))+"'",""+randomNumber(5, 30)+""}));					
 				}
 			}else{//if customer make him order stuff
 				for (long j = 0; j< randomNumber(3, 15); j++) {
 					String items[][]=new String[(int) randomNumber(1, 5)][2];
 					for (int k = 0; k < items.length; k++) {
-						items[k][0]=iSBNStrings.get((int) randomNumber(0,499));
+						items[k][0]="'"+iSBNStrings.get((int) randomNumber(0,499))+"'";
 						items[k][1]=String.valueOf(randomNumber(1, 3));
 					}
 					System.out.println("checkout "+helper.checkoutCart(String.valueOf(id),items));

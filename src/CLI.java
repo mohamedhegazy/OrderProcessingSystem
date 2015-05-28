@@ -67,7 +67,7 @@ public class CLI {
 				.println("*** IF A FIELD IS LEFT BLANK THEN IT WON'T BE CONSIDERED IN SEARCH ***");
 		String info = scanner.nextLine();
 		String valString[] = info.split(",");
-		String fieldString[] = "ISBN,title,Pub_Name,Publication_Year,Price,Category_Name,Minimum_threshold,NO_OF_COPIES"
+		String fieldString[] = "ISBN,title,Pub_Name,Publication_Year,Price,Category_Name,Author_First_Name,Author_Last_Name,NO_OF_COPIES"
 				.split(",");
 		ArrayList<String> values = new ArrayList<>();
 		ArrayList<String> field = new ArrayList<>();
@@ -80,9 +80,9 @@ public class CLI {
 		print(helper.search(new String[] { "book", "Category", "Publisher",
 				"Authors", "Authors_Names" }, (String[]) field.toArray(new String[field.size()]),
 				(String[]) values.toArray(new String[values.size()])), new String[] { "ISBN", "title",
-				"Pub_Name", "Publication_Year", "Price", "First_Name",
-				"Last_Name" }, "ISBN",
-				new String[] { "First_Name", "Last_Name" }, 5);
+				"Pub_Name", "Publication_Year", "Price","Category_Name", "First_Name",
+				"Last_Name","NO_OF_COPIES" }, "ISBN",
+				new String[] { "First_Name", "Last_Name" }, 6);
 
 	}
 
